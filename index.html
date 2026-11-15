@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif - Efek Fotolistrik (Kelas 12 SMA)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax untuk Render Rumus Fisika -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            900: '#0f172a',
+                            950: '#090d16',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Kustomisasi Slider Presisi */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #38bdf8;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            border-radius: 999px;
+        }
+        /* Grid Latar Belakang Kanvas */
+        .lab-grid-bg {
+            background-color: #0b1120;
+            background-image: 
+                linear-gradient(to right, rgba(51, 65, 85, 0.25) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(51, 65, 85, 0.25) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        /* Animasi halus transisi tab */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+
+    <!-- Header & Navigasi Utama -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <!-- Logo & Judul -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                        <i class="fa-solid fa-atom text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white">
+                            Lab Fisika Kuantum: <span class="text-sky-400">Efek Fotolistrik</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Media Pembelajaran Interaktif Kelas XII SMA</p>
+                    </div>
+                </div>
+
+                <!-- Navigasi Tab (Urutan: Materi -> Simulasi -> Evaluasi) -->
+                <nav class="flex bg-slate-850 p-1 rounded-xl border border-slate-800 w-full md:w-auto justify-around md:justify-start">
+                    <button onclick="switchTab('materi')" id="tab-materi" class="tab-btn flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-sky-500 text-white shadow-md">
+                        <i class="fa-solid fa-book-open mr-1.5"></i> Rangkuman Materi
+                    </button>
+                    <button onclick="switchTab('simulasi')" id="tab-simulasi" class="tab-btn flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white transition-all duration-200">
+                        <i class="fa-solid fa-flask mr-1.5"></i> Simulasi Lab
+                    </button>
+                    <button onclick="switchTab('evaluasi')" id="tab-evaluasi" class="tab-btn flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white transition-all duration-200">
+                        <i class="fa-solid fa-pen-to-square mr-1.5"></i> Evaluasi
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- SECTION 1: RANGKUMAN MATERI SUBSTANSIAL    -->
+        <!-- ========================================== -->
+        <section id="section-materi" class="space-y-6 fade-in">
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                    <div>
+                        <span class="px-2.5 py-1 rounded-md bg-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider">Tahap 1 • Konsep Esensial Fisika Modern</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-white mt-2">Teori Kuantum Cahaya & Efek Fotolistrik</h2>
+                        <p class="text-sm text-slate-400 mt-1">Pahami prinsip dasar emisi fotoelektron sebelum melakukan eksperimen di laboratorium virtual.</p>
+                    </div>
+                    <button onclick="switchTab('simulasi')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-sky-500/25 transition shrink-0 self-start sm:self-center">
+                        Lanjut ke Simulasi Lab <i class="fa-solid fa-arrow-right ml-1.5"></i>
+                    </button>
+                </div>
+
+                <!-- Grid Kartu Konsep -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Kartu 1 -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 hover:border-sky-500/40 transition">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">1</div>
+                            <h3 class="text-base font-bold text-sky-400">Pengertian & Hipotesis Foton Einstein</h3>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            <strong>Efek fotolistrik</strong> adalah peristiwa terlepasnya elektron dari permukaan logam ketika disinari oleh gelombang elektromagnetik (cahaya) dengan frekuensi tertentu. Menurut <strong>Albert Einstein (1905)</strong>, cahaya terdiri atas paket-paket energi diskrit yang disebut <strong>foton</strong>.
+                        </p>
+                        <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800/80 text-center">
+                            \[ E = h \cdot f = \frac{h \cdot c}{\lambda} \]
+                            <p class="text-xs text-slate-400 mt-1">\(h = 6,63 \times 10^{-34}\text{ J}\cdot\text{s}\) (Konstanta Planck), \(c = 3 \times 10^8\text{ m/s}\)</p>
+                        </div>
+                    </div>
+
+                    <!-- Kartu 2 -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 hover:border-emerald-500/40 transition">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">2</div>
+                            <h3 class="text-base font-bold text-emerald-400">Fungsi Kerja (\(W_0\)) & Frekuensi Ambang (\(f_0\))</h3>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Setiap logam memiliki energi ikat minimum untuk melepaskan elektronnya yang disebut <strong>fungsi kerja (\(W_0\))</strong>. Elektron hanya dapat terlepas jika energi foton datang lebih besar atau sama dengan fungsi kerja logam:
+                        </p>
+                        <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800/80 text-center">
+                            \[ W_0 = h \cdot f_0 = \frac{h \cdot c}{\lambda_0} \]
+                            <p class="text-xs text-emerald-300 mt-1.5 font-semibold">Syarat Terjadi Efek Fotolistrik: \(f \ge f_0\) atau \(\lambda \le \lambda_0\)</p>
+                        </div>
+                    </div>
+
+                    <!-- Kartu 3 -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 hover:border-amber-500/40 transition">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">3</div>
+                            <h3 class="text-base font-bold text-amber-400">Energi Kinetik Maksimum & Potensial Henti</h3>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Kelebihan energi foton setelah digunakan untuk mengatasi fungsi kerja logam diubah menjadi <strong>energi kinetik maksimum (\(E_{k,\text{maks}}\))</strong> fotoelektron. Arus fotoelektron dapat dihentikan oleh tegangan balik sebesar <strong>potensial henti (\(V_0\))</strong>.
+                        </p>
+                        <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800/80 text-center">
+                            \[ E_{k,\text{maks}} = h f - W_0 = e \cdot V_0 \]
+                            <p class="text-xs text-slate-400 mt-1">\(e = 1,6 \times 10^{-19}\text{ C}\) (Muatan elementer elektron)</p>
+                        </div>
+                    </div>
+
+                    <!-- Kartu 4 -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 hover:border-purple-500/40 transition">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">4</div>
+                            <h3 class="text-base font-bold text-purple-400">Pengaruh Frekuensi vs Intensitas Cahaya</h3>
+                        </div>
+                        <ul class="text-sm text-slate-300 space-y-2.5 leading-relaxed">
+                            <li class="flex items-start gap-2">
+                                <span class="text-purple-400 font-bold mt-0.5"><i class="fa-solid fa-bolt"></i></span>
+                                <span><strong>Menaikkan Frekuensi (\(f\)):</strong> Memperbesar energi setiap foton, sehingga \(E_{k,\text{maks}}\) dan potensial henti (\(V_0\)) meningkat, namun jumlah elektron yang lepas tetap.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400 font-bold mt-0.5"><i class="fa-solid fa-sun"></i></span>
+                                <span><strong>Menaikkan Intensitas (\(I\)):</strong> Memperbanyak jumlah foton per detik, sehingga laju elektron lepas dan <strong>kuat arus listrik</strong> meningkat (jika \(f > f_0\)), sedangkan \(E_{k,\text{maks}}\) tetap.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: SIMULASI LABORATORIUM VIRTUAL   -->
+        <!-- ========================================== -->
+        <section id="section-simulasi" class="hidden space-y-6 fade-in">
+            
+            <!-- Banner Status Eksperimen -->
+            <div id="status-banner" class="rounded-2xl p-4 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all duration-300 bg-emerald-950/40 border-emerald-500/30">
+                <div class="flex items-center gap-3">
+                    <div id="status-icon" class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-circle-check text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 id="status-title" class="text-sm font-bold text-emerald-300">Emisi Fotoelektron Aktif</h3>
+                        <p id="status-desc" class="text-xs text-slate-300">Energi foton melampaui fungsi kerja katoda. Elektron terlepas dan mengalir menuju anoda.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-end sm:self-center">
+                    <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
+                        \(\lambda_0 =\) <span id="badge-lambda0" class="font-bold text-sky-400">590 nm</span>
+                    </span>
+                    <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
+                        \(f_0 =\) <span id="badge-f0" class="font-bold text-amber-400">5.08 × 10¹⁴ Hz</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Grid Utama: Kanvas Tabung Vakum & Grafik -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Kolom Kiri (7 kolom): Kanvas Tabung Fotolistrik Realistis -->
+                <div class="lg:col-span-7 bg-slate-900 rounded-2xl border border-slate-800 p-4 flex flex-col justify-between shadow-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300">Tabung Vakum Kuarsa & Rangkaian DC</h2>
+                        </div>
+                        <span id="spectrum-label" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                            Cahaya Tampak (Ungu)
+                        </span>
+                    </div>
+
+                    <!-- Wrapper Kanvas Simulasi Tabung -->
+                    <div class="relative w-full h-[340px] sm:h-[380px] rounded-xl overflow-hidden border border-slate-700/80 lab-grid-bg shadow-inner">
+                        <canvas id="labCanvas" class="w-full h-full block"></canvas>
+                        
+                        <!-- Overlay Keterangan Katoda & Anoda -->
+                        <div class="absolute bottom-2.5 left-3 right-3 flex justify-between text-[11px] font-mono text-slate-400 pointer-events-none">
+                            <span class="bg-slate-950/80 px-2 py-0.5 rounded border border-slate-800">Katoda: <strong id="canvas-metal-name" class="text-amber-300">Sesium (Cs)</strong></span>
+                            <span class="bg-slate-950/80 px-2 py-0.5 rounded border border-slate-800">Ruang Hampa (\(10^{-7}\text{ Torr}\))</span>
+                        </div>
+                    </div>
+
+                    <!-- Indikator Pembacaan Digital Real-Time -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4">
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <p class="text-[11px] text-slate-400">Energi Foton (\(E\))</p>
+                            <p id="read-efoton" class="text-base sm:text-lg font-mono font-bold text-sky-400 mt-0.5">3.10 eV</p>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <p class="text-[11px] text-slate-400">\(E_{k,\text{maks}}\) Elektron</p>
+                            <p id="read-ekmax" class="text-base sm:text-lg font-mono font-bold text-emerald-400 mt-0.5">1.00 eV</p>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <p class="text-[11px] text-slate-400">Potensial Henti (\(V_0\))</p>
+                            <p id="read-vstop" class="text-base sm:text-lg font-mono font-bold text-rose-400 mt-0.5">1.00 V</p>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <p class="text-[11px] text-slate-400">Arus Listrik (\(I\))</p>
+                            <p id="read-current" class="text-base sm:text-lg font-mono font-bold text-amber-400 mt-0.5">0.42 mA</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolom Kanan (5 kolom): Grafik Ek vs Frekuensi Real-Time -->
+                <div class="lg:col-span-5 bg-slate-900 rounded-2xl border border-slate-800 p-4 flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300">
+                                <i class="fa-solid fa-chart-line text-sky-400 mr-1.5"></i> Grafik \(E_{k,\text{maks}}\) terhadap Frekuensi (\(f\))
+                            </h2>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Kemiringan garis menyatakan konstanta Planck (\(h\)), sedangkan perpotongan sumbu datar adalah frekuensi ambang (\(f_0\)).</p>
+                    </div>
+
+                    <div class="relative w-full h-[260px] sm:h-[290px] rounded-xl overflow-hidden border border-slate-700/80 bg-slate-950">
+                        <canvas id="graphCanvas" class="w-full h-full block"></canvas>
+                    </div>
+
+                    <div class="mt-3 p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">Frekuensi Cahaya (\(f\)):</span>
+                        <span id="read-freq" class="font-mono font-bold text-indigo-300">7.50 × 10¹⁴ Hz</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Kontrol Presisi (Skala Terkecil 1 Digit + Tombol Fine-Tuning) -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-800">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-sky-400"></i> Panel Kontrol Variabel Eksperimen (Presisi Skala 1 Digit)
+                    </h3>
+                    <button onclick="resetSimulation()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition self-start sm:self-auto">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Reset Default
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    
+                    <!-- Kontrol 1: Jenis Logam Katoda -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-3">
+                        <div>
+                            <label for="metal-select" class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
+                                1. Logam Target (Katoda)
+                            </label>
+                            <select id="metal-select" onchange="updateSimulationParams()" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-sky-500 font-semibold">
+                                <option value="cesium" selected>Sesium (Cs) — W₀ = 2.10 eV</option>
+                                <option value="potassium">Kalium (K) — W₀ = 2.30 eV</option>
+                                <option value="sodium">Natrium (Na) — W₀ = 2.75 eV</option>
+                                <option value="calcium">Kalsium (Ca) — W₀ = 2.87 eV</option>
+                                <option value="zinc">Seng (Zn) — W₀ = 4.30 eV</option>
+                                <option value="copper">Tembaga (Cu) — W₀ = 4.70 eV</option>
+                                <option value="platinum">Platina (Pt) — W₀ = 5.65 eV</option>
+                            </select>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800/80 flex justify-between items-center text-xs">
+                            <span class="text-slate-400">Fungsi Kerja (\(W_0\)):</span>
+                            <span id="display-workfunc" class="font-mono font-bold text-amber-400">2.10 eV</span>
+                        </div>
+                    </div>
+
+                    <!-- Kontrol 2: Panjang Gelombang / Frekuensi (Step = 1 nm) -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label for="wavelength-slider" class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                2. Panjang Gelombang (\(\lambda\))
+                            </label>
+                            <span id="val-wavelength" class="font-mono text-sm font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/30">400 nm</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <button onclick="stepControl('wavelength-slider', -1)" title="Kurangi 1 nm" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-center shrink-0 transition active:scale-95">−</button>
+                            <input type="range" id="wavelength-slider" min="150" max="850" step="1" value="400" oninput="updateSimulationParams()" class="w-full" style="background: linear-gradient(to right, #a855f7, #3b82f6, #22c55e, #eab308, #ef4444, #7f1d1d); border-radius: 999px; height: 6px;">
+                            <button onclick="stepControl('wavelength-slider', 1)" title="Tambah 1 nm" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-center shrink-0 transition active:scale-95">+</button>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                            <span>150 nm (UV)</span>
+                            <span>Skala: 1 nm</span>
+                            <span>850 nm (IR)</span>
+                        </div>
+                    </div>
+
+                    <!-- Kontrol 3: Intensitas Cahaya (Step = 1%) -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label for="intensity-slider" class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                3. Intensitas Cahaya (\(I\))
+                            </label>
+                            <span id="val-intensity" class="font-mono text-sm font-bold text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/30">70%</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="stepControl('intensity-slider', -1)" title="Kurangi 1%" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-center shrink-0 transition active:scale-95">−</button>
+                            <input type="range" id="intensity-slider" min="0" max="100" step="1" value="70" oninput="updateSimulationParams()" class="w-full bg-slate-800 rounded-full h-1.5">
+                            <button onclick="stepControl('intensity-slider', 1)" title="Tambah 1%" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-center shrink-0 transition active:scale-95">+</button>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                            <span>0% (Gelap)</span>
+                            <span>Skala: 1%</span>
+                            <span>100% (Maks)</span>
+                        </div>
+                    </div>
+
+                    <!-- Kontrol 4: Tegangan Baterai (Step = 0.01 V) -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label for="voltage-slider" class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                4. Tegangan Baterai (\(\Delta V\))
+                            </label>
+                            <span id="val-voltage" class="font-mono text-sm font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">+0.00 V</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="stepControl('voltage-slider', -0.01)" title="Kurangi 0.01 V" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-center shrink-0 transition active:scale-95">−</button>
+                            <input type="range" id="voltage-slider" min="-5.00" max="5.00" step="0.01" value="0.00" oninput="updateSimulationParams()" class="w-full bg-slate-800 rounded-full h-1.5">
+                            <button onclick="stepControl('voltage-slider', 0.01)" title="Tambah 0.01 V" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-center shrink-0 transition active:scale-95">+</button>
+                        </div>
+                        <div class="flex items-center justify-between gap-1.5 pt-0.5">
+                            <button onclick="setZeroVoltage()" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-300 transition">
+                                0.00 V
+                            </button>
+                            <button onclick="setStoppingVoltage()" class="flex-1 py-1.5 px-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-[11px] font-semibold text-rose-300 border border-rose-500/30 transition">
+                                Set -V₀
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Navigasi Lanjut ke Evaluasi -->
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="switchTab('materi')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition">
+                    <i class="fa-solid fa-arrow-left mr-1.5"></i> Kembali ke Materi
+                </button>
+                <button onclick="switchTab('evaluasi')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-sky-500/25 transition">
+                    Lanjut ke Evaluasi <i class="fa-solid fa-arrow-right ml-1.5"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 3: EVALUASI PEMAHAMAN              -->
+        <!-- ========================================== -->
+        <section id="section-evaluasi" class="hidden space-y-6 fade-in">
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5 mb-6">
+                    <div>
+                        <span class="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider">Tahap 3 • Uji Pemahaman & Penalaran</span>
+                        <h2 class="text-2xl font-bold text-white mt-2">Evaluasi Efek Fotolistrik</h2>
+                        <p class="text-sm text-slate-400 mt-1">Kerjakan soal-soal analisis berikut (Pilihan Ganda, Benar/Salah, dan Pilihan Ganda Kompleks) untuk mengukur penguasaan konsep Anda.</p>
+                    </div>
+                    <div id="quiz-score-box" class="hidden bg-slate-950 border border-sky-500/40 px-5 py-3 rounded-2xl text-center shrink-0">
+                        <p class="text-xs text-slate-400 uppercase font-bold">Skor Akhir Anda</p>
+                        <p id="quiz-score-val" class="text-2xl font-extrabold text-sky-400 font-mono mt-0.5">0 / 100</p>
+                    </div>
+                </div>
+
+                <!-- Kontainer Daftar Soal -->
+                <div id="quiz-container" class="space-y-6"></div>
+
+                <!-- Tombol Aksi Evaluasi -->
+                <div class="mt-8 pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4">
+                    <button onclick="switchTab('simulasi')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition">
+                        <i class="fa-solid fa-arrow-left mr-1.5"></i> Kembali ke Simulasi
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <button onclick="resetQuiz()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition">
+                            <i class="fa-solid fa-rotate-right mr-1.5"></i> Ulangi Evaluasi
+                        </button>
+                        <button onclick="submitQuiz()" id="btn-submit-quiz" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 transition">
+                            <i class="fa-solid fa-check-double mr-1.5"></i> Periksa Jawaban & Lihat Pembahasan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-900/50 py-4 text-center text-xs text-slate-500">
+        Media Pembelajaran Interaktif Fisika SMA Kelas XII • Materi Efek Fotolistrik
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- LOGIKA JAVASCRIPT SIMULASI & EVALUASI      -->
+    <!-- ========================================== -->
+    <script>
+        // --- 1. DATA FISIKA & KONSTANTA ---
+        const H_EV = 4.135667696e-15; // Konstanta Planck dalam eV.s
+        const C = 2.99792458e8;       // Kecepatan cahaya dalam m/s
+        const HC_EV_NM = 1239.84198;  // Perkalian h*c dalam eV.nm
+
+        const METALS = {
+            cesium:    { name: 'Sesium (Cs)',   workFunc: 2.10, colorLight: '#facc15', colorDark: '#a16207' },
+            potassium: { name: 'Kalium (K)',    workFunc: 2.30, colorLight: '#e2e8f0', colorDark: '#64748b' },
+            sodium:    { name: 'Natrium (Na)',  workFunc: 2.75, colorLight: '#cbd5e1', colorDark: '#475569' },
+            calcium:   { name: 'Kalsium (Ca)',  workFunc: 2.87, colorLight: '#d6d3d1', colorDark: '#57534e' },
+            zinc:      { name: 'Seng (Zn)',     workFunc: 4.30, colorLight: '#94a3b8', colorDark: '#334155' },
+            copper:    { name: 'Tembaga (Cu)',  workFunc: 4.70, colorLight: '#fb923c', colorDark: '#9a3412' },
+            platinum:  { name: 'Platina (Pt)',  workFunc: 5.65, colorLight: '#f8fafc', colorDark: '#64748b' }
+        };
+
+        // State Simulasi
+        let simState = {
+            metalKey: 'cesium',
+            wavelength: 400, // nm
+            intensity: 70,   // %
+            voltage: 0.00,   // Volt
+            photonEnergy: 0,
+            ekMax: 0,
+            stoppingVoltage: 0,
+            current: 0,
+            frequency: 0,
+            thresholdFreq: 0,
+            thresholdWavelength: 0,
+            isEmitting: false
+        };
+
+        // Partikel Animasi
+        let photons = [];
+        let electrons = [];
+        let lastTimestamp = 0;
+        let photonSpawnTimer = 0;
+
+        // --- 2. FUNGSI NAVIGASI TAB ---
+        function switchTab(tabName) {
+            const sections = ['materi', 'simulasi', 'evaluasi'];
+            sections.forEach(sec => {
+                document.getElementById(`section-${sec}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${sec}`);
+                btn.classList.remove('bg-sky-500', 'text-white', 'shadow-md');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.classList.remove('text-slate-400');
+            activeBtn.classList.add('bg-sky-500', 'text-white', 'shadow-md');
+
+            if (tabName === 'simulasi') {
+                resizeCanvases();
+                drawGraph();
+            }
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 3. PERHITUNGAN FISIKA EFEK FOTOLISTRIK ---
+        function stepControl(sliderId, delta) {
+            const slider = document.getElementById(sliderId);
+            const min = parseFloat(slider.min);
+            const max = parseFloat(slider.max);
+            let val = parseFloat(slider.value) + delta;
+            val = Math.max(min, Math.min(max, val));
+            slider.value = sliderId === 'voltage-slider' ? val.toFixed(2) : Math.round(val);
+            updateSimulationParams();
+        }
+
+        function setZeroVoltage() {
+            document.getElementById('voltage-slider').value = "0.00";
+            updateSimulationParams();
+        }
+
+        function setStoppingVoltage() {
+            updateSimulationParams();
+            const targetV = -simState.stoppingVoltage;
+            const clampedV = Math.max(-5.00, Math.min(5.00, targetV));
+            document.getElementById('voltage-slider').value = clampedV.toFixed(2);
+            updateSimulationParams();
+        }
+
+        function resetSimulation() {
+            document.getElementById('metal-select').value = 'cesium';
+            document.getElementById('wavelength-slider').value = 400;
+            document.getElementById('intensity-slider').value = 70;
+            document.getElementById('voltage-slider').value = "0.00";
+            photons = [];
+            electrons = [];
+            updateSimulationParams();
+        }
+
+        function wavelengthToRGB(wl) {
+            let r = 0, g = 0, b = 0, label = '';
+            if (wl < 380) {
+                r = 168; g = 85; b = 247;
+                label = 'Ultraviolet (UV)';
+            } else if (wl >= 380 && wl < 450) {
+                r = 129; g = 140; b = 248;
+                label = 'Cahaya Tampak (Ungu)';
+            } else if (wl >= 450 && wl < 495) {
+                r = 56; g = 189; b = 248;
+                label = 'Cahaya Tampak (Biru)';
+            } else if (wl >= 495 && wl < 570) {
+                r = 52; g = 211; b = 153;
+                label = 'Cahaya Tampak (Hijau)';
+            } else if (wl >= 570 && wl < 590) {
+                r = 250; g = 204; b = 21;
+                label = 'Cahaya Tampak (Kuning)';
+            } else if (wl >= 590 && wl < 620) {
+                r = 251; g = 146; b = 60;
+                label = 'Cahaya Tampak (Jingga)';
+            } else if (wl >= 620 && wl <= 750) {
+                r = 248; g = 113; b = 113;
+                label = 'Cahaya Tampak (Merah)';
+            } else {
+                r = 185; g = 28; b = 28;
+                label = 'Inframerah (IR)';
+            }
+            return { r, g, b, css: `rgb(${r}, ${g}, ${b})`, label };
+        }
+
+        function updateSimulationParams() {
+            const metalKey = document.getElementById('metal-select').value;
+            const wl = parseInt(document.getElementById('wavelength-slider').value);
+            const intensity = parseInt(document.getElementById('intensity-slider').value);
+            const voltage = parseFloat(document.getElementById('voltage-slider').value);
+
+            const metal = METALS[metalKey];
+            const eFoton = HC_EV_NM / wl; // eV
+            const freq = (C / (wl * 1e-9)) / 1e14; // dalam 10^14 Hz
+            const f0 = (metal.workFunc / H_EV) / 1e14; // dalam 10^14 Hz
+            const lambda0 = HC_EV_NM / metal.workFunc; // nm
+
+            const isEmitting = (eFoton >= metal.workFunc) && (intensity > 0);
+            const ekMax = isEmitting ? Math.max(0, eFoton - metal.workFunc) : 0;
+            const vStop = ekMax; // Karena Ek dalam eV, nilai V_0 dalam Volt sama persis
+
+            // Perhitungan Arus Listrik (mA) yang realistis
+            let current = 0;
+            if (isEmitting && ekMax > 0) {
+                // Arus saturasi sebanding dengan intensitas dan jumlah foton
+                const iSat = (intensity / 100) * (wl / 400) * 0.65;
+                if (voltage >= 0) {
+                    // Tegangan pemercepat cepat mencapai arus saturasi
+                    current = iSat * (1 - 0.15 * Math.exp(-voltage * 2.5));
+                } else if (voltage > -vStop) {
+                    // Tegangan penghambat mengurangi fraksi elektron yang sampai ke anoda
+                    const ratio = 1 - (Math.abs(voltage) / vStop);
+                    current = iSat * 0.85 * Math.pow(ratio, 1.3);
+                } else {
+                    // Tegangan <= -V0: semua elektron tertahan sebelum mencapai anoda
+                    current = 0;
+                }
+            }
+
+            // Simpan ke State
+            simState = {
+                metalKey,
+                wavelength: wl,
+                intensity,
+                voltage,
+                photonEnergy: eFoton,
+                ekMax,
+                stoppingVoltage: vStop,
+                current,
+                frequency: freq,
+                thresholdFreq: f0,
+                thresholdWavelength: lambda0,
+                isEmitting
+            };
+
+            // Update UI Teks & Indikator
+            document.getElementById('display-workfunc').textContent = `${metal.workFunc.toFixed(2)} eV`;
+            document.getElementById('canvas-metal-name').textContent = metal.name;
+            document.getElementById('val-wavelength').textContent = `${wl} nm`;
+            document.getElementById('val-intensity').textContent = `${intensity}%`;
+            
+            const vSign = voltage > 0 ? '+' : '';
+            document.getElementById('val-voltage').textContent = `${vSign}${voltage.toFixed(2)} V`;
+
+            document.getElementById('read-efoton').textContent = `${eFoton.toFixed(2)} eV`;
+            document.getElementById('read-ekmax').textContent = `${ekMax.toFixed(2)} eV`;
+            document.getElementById('read-vstop').textContent = `${vStop.toFixed(2)} V`;
+            document.getElementById('read-current').textContent = `${current.toFixed(2)} mA`;
+            document.getElementById('read-freq').textContent = `${freq.toFixed(2)} × 10¹⁴ Hz`;
+
+            document.getElementById('badge-lambda0').textContent = `${Math.round(lambda0)} nm`;
+            document.getElementById('badge-f0').textContent = `${f0.toFixed(2)} × 10¹⁴ Hz`;
+
+            const spec = wavelengthToRGB(wl);
+            const specBadge = document.getElementById('spectrum-label');
+            specBadge.textContent = spec.label;
+            specBadge.style.color = spec.css;
+            specBadge.style.borderColor = `rgba(${spec.r}, ${spec.g}, ${spec.b}, 0.4)`;
+            specBadge.style.backgroundColor = `rgba(${spec.r}, ${spec.g}, ${spec.b}, 0.12)`;
+
+            updateStatusBanner();
+            drawGraph();
+        }
+
+        function updateStatusBanner() {
+            const banner = document.getElementById('status-banner');
+            const icon = document.getElementById('status-icon');
+            const title = document.getElementById('status-title');
+            const desc = document.getElementById('status-desc');
+
+            if (simState.intensity === 0) {
+                banner.className = "rounded-2xl p-4 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all duration-300 bg-slate-900 border-slate-700";
+                icon.className = "w-9 h-9 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center shrink-0";
+                icon.innerHTML = '<i class="fa-solid fa-lightbulb text-lg"></i>';
+                title.className = "text-sm font-bold text-slate-300";
+                title.textContent = "Sumber Cahaya Padam (Intensitas 0%)";
+                desc.textContent = "Naikkan intensitas cahaya untuk menembakkan foton ke permukaan logam katoda.";
+            } else if (!simState.isEmitting || simState.ekMax <= 0) {
+                banner.className = "rounded-2xl p-4 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all duration-300 bg-amber-950/30 border-amber-500/30";
+                icon.className = "w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0";
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-lg"></i>';
+                title.className = "text-sm font-bold text-amber-300";
+                title.textContent = "Tidak Terjadi Emisi Fotoelektron (E < W₀)";
+                desc.textContent = `Energi foton (${simState.photonEnergy.toFixed(2)} eV) lebih kecil dari fungsi kerja logam (${METALS[simState.metalKey].workFunc.toFixed(2)} eV). Perkecil panjang gelombang!`;
+            } else if (simState.current === 0 && simState.voltage <= -simState.stoppingVoltage) {
+                banner.className = "rounded-2xl p-4 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all duration-300 bg-rose-950/30 border-rose-500/30";
+                icon.className = "w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0";
+                icon.innerHTML = '<i class="fa-solid fa-hand text-lg"></i>';
+                title.className = "text-sm font-bold text-rose-300";
+                title.textContent = "Potensial Henti Tercapai (Arus = 0.00 mA)";
+                desc.textContent = "Elektron terlepas dari katoda, namun seluruhnya tertolak kembali sebelum mencapai pelat anoda.";
+            } else {
+                banner.className = "rounded-2xl p-4 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all duration-300 bg-emerald-950/40 border-emerald-500/30";
+                icon.className = "w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0";
+                icon.innerHTML = '<i class="fa-solid fa-circle-check text-lg"></i>';
+                title.className = "text-sm font-bold text-emerald-300";
+                title.textContent = "Emisi Fotoelektron Aktif & Arus Mengalir";
+                desc.textContent = `Foton melepaskan elektron dengan Ek maks ${simState.ekMax.toFixed(2)} eV dan menghasilkan arus ${simState.current.toFixed(2)} mA.`;
+            }
+        }
+
+        // --- 4. ANIMASI TABUNG VAKUM KUARSA REALISTIS ---
+        const labCanvas = document.getElementById('labCanvas');
+        const labCtx = labCanvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+
+        function resizeCanvases() {
+            [labCanvas, graphCanvas].forEach(canvas => {
+                if (!canvas) return;
+                const rect = canvas.parentElement.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                const ctx = canvas.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            });
+        }
+        window.addEventListener('resize', () => {
+            resizeCanvases();
+            drawGraph();
+        });
+
+        function animateLab(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.05);
+            lastTimestamp = timestamp;
+
+            const w = labCanvas.clientWidth;
+            const h = labCanvas.clientHeight;
+            if (w === 0 || h === 0) {
+                requestAnimationFrame(animateLab);
+                return;
+            }
+
+            labCtx.clearRect(0, 0, w, h);
+
+            // Dimensi Komponen Laboratorium
+            const tubeX = w * 0.22;
+            const tubeY = h * 0.16;
+            const tubeW = w * 0.66;
+            const tubeH = h * 0.48;
+            const tubeCenterY = tubeY + tubeH / 2;
+
+            const cathodeX = tubeX + tubeW * 0.16;
+            const anodeX = tubeX + tubeW * 0.84;
+            const plateTop = tubeY + tubeH * 0.20;
+            const plateBot = tubeY + tubeH * 0.80;
+
+            const spec = wavelengthToRGB(simState.wavelength);
+
+            // 1. GAMBAR RANGKAIAN KABEL LUAR, BATERAI DC & AMPEREMETER
+            const circuitBottomY = h * 0.84;
+            const batteryX = w * 0.42;
+            const ammeterX = w * 0.68;
+
+            labCtx.save();
+            labCtx.strokeStyle = '#475569';
+            labCtx.lineWidth = 3;
+            labCtx.lineJoin = 'round';
+
+            // Jalur kabel kiri (Katoda -> Baterai)
+            labCtx.beginPath();
+            labCtx.moveTo(tubeX, tubeCenterY);
+            labCtx.lineTo(tubeX - 18, tubeCenterY);
+            labCtx.lineTo(tubeX - 18, circuitBottomY);
+            labCtx.lineTo(batteryX - 45, circuitBottomY);
+            labCtx.stroke();
+
+            // Jalur kabel tengah (Baterai -> Amperemeter)
+            labCtx.beginPath();
+            labCtx.moveTo(batteryX + 45, circuitBottomY);
+            labCtx.lineTo(ammeterX - 38, circuitBottomY);
+            labCtx.stroke();
+
+            // Jalur kabel kanan (Amperemeter -> Anoda)
+            labCtx.beginPath();
+            labCtx.moveTo(ammeterX + 38, circuitBottomY);
+            labCtx.lineTo(tubeX + tubeW + 18, circuitBottomY);
+            labCtx.lineTo(tubeX + tubeW + 18, tubeCenterY);
+            labCtx.lineTo(tubeX + tubeW, tubeCenterY);
+            labCtx.stroke();
+            labCtx.restore();
+
+            // Catu Daya Variabel DC (Baterai)
+            drawDCPowerSupply(labCtx, batteryX, circuitBottomY, simState.voltage);
+
+            // Amperemeter Digital pada Rangkaian
+            drawAmmeterInstrument(labCtx, ammeterX, circuitBottomY, simState.current);
+
+            // 2. GAMBAR SUMBER CAHAYA MONOKROMATOR (PROYEKTOR SPEKTRUM)
+            const lampX = w * 0.09;
+            const lampY = tubeY - 12;
+            drawMonochromatorLamp(labCtx, lampX, lampY, cathodeX, tubeCenterY, spec, simState.intensity);
+
+            // 3. GAMBAR TABUNG VAKUM KUARSA (LATAR BELAKANG)
+            labCtx.save();
+            const glassGrad = labCtx.createLinearGradient(tubeX, tubeY, tubeX, tubeY + tubeH);
+            glassGrad.addColorStop(0, 'rgba(148, 163, 184, 0.14)');
+            glassGrad.addColorStop(0.2, 'rgba(30, 41, 59, 0.45)');
+            glassGrad.addColorStop(0.8, 'rgba(15, 23, 42, 0.65)');
+            glassGrad.addColorStop(1, 'rgba(148, 163, 184, 0.16)');
+
+            labCtx.fillStyle = glassGrad;
+            labCtx.beginPath();
+            labCtx.roundRect(tubeX, tubeY, tubeW, tubeH, 28);
+            labCtx.fill();
+            labCtx.restore();
+
+            // 4. GAMBAR PELAT KATODA LENGKUNG & ANODA BATANG KOLEKTOR
+            const metalInfo = METALS[simState.metalKey];
+            
+            // Tangkai penyangga katoda
+            labCtx.fillStyle = '#64748b';
+            labCtx.fillRect(tubeX, tubeCenterY - 4, cathodeX - tubeX - 6, 8);
+
+            // Pelat Katoda Cekung (Realistis)
+            labCtx.save();
+            const catGrad = labCtx.createLinearGradient(cathodeX - 10, plateTop, cathodeX + 10, plateBot);
+            catGrad.addColorStop(0, metalInfo.colorLight);
+            catGrad.addColorStop(0.5, metalInfo.colorDark);
+            catGrad.addColorStop(1, metalInfo.colorLight);
+
+            labCtx.strokeStyle = catGrad;
+            labCtx.lineWidth = 9;
+            labCtx.lineCap = 'round';
+            labCtx.beginPath();
+            labCtx.moveTo(cathodeX - 6, plateTop);
+            labCtx.quadraticCurveTo(cathodeX + 8, tubeCenterY, cathodeX - 6, plateBot);
+            labCtx.stroke();
+            labCtx.restore();
+
+            // Tangkai & Kolektor Anoda
+            labCtx.fillStyle = '#64748b';
+            labCtx.fillRect(anodeX, tubeCenterY - 4, (tubeX + tubeW) - anodeX, 8);
+
+            labCtx.save();
+            const anodeGrad = labCtx.createLinearGradient(anodeX - 5, plateTop, anodeX + 5, plateBot);
+            anodeGrad.addColorStop(0, '#cbd5e1');
+            anodeGrad.addColorStop(0.5, '#64748b');
+            anodeGrad.addColorStop(1, '#cbd5e1');
+            labCtx.fillStyle = anodeGrad;
+            labCtx.beginPath();
+            labCtx.roundRect(anodeX - 5, plateTop + 8, 10, (plateBot - plateTop) - 16, 4);
+            labCtx.fill();
+            labCtx.restore();
+
+            // 5. SPAWN & UPDATE PARTIKEL FOTON (GELOMBANG PAKET ENERGI)
+            if (simState.intensity > 0) {
+                const spawnRate = (simState.intensity / 100) * 28; // foton per detik
+                photonSpawnTimer += dt * spawnRate;
+                while (photonSpawnTimer >= 1) {
+                    photonSpawnTimer -= 1;
+                    const targetY = plateTop + 14 + Math.random() * (plateBot - plateTop - 28);
+                    photons.push({
+                        x: lampX + 26,
+                        y: lampY + 18,
+                        tx: cathodeX,
+                        ty: targetY,
+                        progress: 0,
+                        speed: 1.85 + Math.random() * 0.25,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            // Gambar dan gerakkan Foton
+            for (let i = photons.length - 1; i >= 0; i--) {
+                const p = photons[i];
+                p.progress += p.speed * dt;
+                const curX = p.x + (p.tx - p.x) * p.progress;
+                const curY = p.y + (p.ty - p.y) * p.progress;
+
+                // Gambar gelombang sinusoid kecil sebagai paket foton
+                drawPhotonPacket(labCtx, curX, curY, Math.atan2(p.ty - p.y, p.tx - p.x), spec.css, p.phase + timestamp * 0.02);
+
+                if (p.progress >= 1) {
+                    // Jika energi cukup, lahirkan fotoelektron dari permukaan katoda
+                    if (simState.isEmitting && simState.ekMax > 0) {
+                        const ekFactor = Math.random(); // Variasi energi kinetik dari 0 s.d. Ek_maks
+                        const electronEk = simState.ekMax * (0.25 + 0.75 * ekFactor);
+                        const v0 = 130 + Math.sqrt(electronEk) * 145; // Kecepatan awal proporsional sqrt(Ek)
+                        const vy = (Math.random() - 0.5) * 32;
+                        electrons.push({
+                            x: cathodeX + 6,
+                            y: p.ty,
+                            vx: v0,
+                            vy: vy,
+                            ek: electronEk
+                        });
+                    }
+                    photons.splice(i, 1);
+                }
+            }
+
+            // 6. UPDATE & GAMBAR FOTOELEKTRON (PARTIKEL BOLA PLASMA BERSIH TANPA EKOR)
+            const distPlates = anodeX - cathodeX;
+            // Percepatan listrik akibat beda potensial V antara katoda dan anoda: a = (e * V) / (m * d)
+            const accelX = (simState.voltage * 19500) / Math.max(distPlates, 100);
+
+            for (let i = electrons.length - 1; i >= 0; i--) {
+                const el = electrons[i];
+                el.vx += accelX * dt;
+                el.x += el.vx * dt;
+                el.y += el.vy * dt;
+
+                // Pantulan halus jika menyentuh batas atas/bawah ruang tabung
+                if (el.y < tubeY + 18) { el.y = tubeY + 18; el.vy *= -0.6; }
+                if (el.y > tubeY + tubeH - 18) { el.y = tubeY + tubeH - 18; el.vy *= -0.6; }
+
+                // Gambar partikel elektron bulat bersih bercahaya
+                drawCleanElectron(labCtx, el.x, el.y);
+
+                // Hapus jika mencapai anoda atau kembali terserap katoda
+                if (el.x >= anodeX - 4 || el.x < cathodeX - 2) {
+                    electrons.splice(i, 1);
+                }
+            }
+
+            // 7. GARIS TEPI & KILAU KACA TABUNG KUARSA (FOREGROUND)
+            labCtx.save();
+            labCtx.strokeStyle = 'rgba(148, 163, 184, 0.45)';
+            labCtx.lineWidth = 2.5;
+            labCtx.beginPath();
+            labCtx.roundRect(tubeX, tubeY, tubeW, tubeH, 28);
+            labCtx.stroke();
+
+            // Kilau refleksi kaca bagian atas
+            labCtx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+            labCtx.lineWidth = 3;
+            labCtx.beginPath();
+            labCtx.moveTo(tubeX + 26, tubeY + 8);
+            labCtx.lineTo(tubeX + tubeW - 26, tubeY + 8);
+            labCtx.stroke();
+
+            // Tutup Segel Logam Kiri & Kanan Tabung
+            labCtx.fillStyle = '#334155';
+            labCtx.strokeStyle = '#64748b';
+            labCtx.lineWidth = 1.5;
+            labCtx.beginPath();
+            labCtx.roundRect(tubeX - 5, tubeCenterY - 22, 10, 44, 3);
+            labCtx.fill();
+            labCtx.stroke();
+
+            labCtx.beginPath();
+            labCtx.roundRect(tubeX + tubeW - 5, tubeCenterY - 22, 10, 44, 3);
+            labCtx.fill();
+            labCtx.stroke();
+            labCtx.restore();
+
+            requestAnimationFrame(animateLab);
+        }
+
+        // Helper Visual: Sumber Cahaya Monokromator & Berkas Sinar
+        function drawMonochromatorLamp(ctx, lx, ly, targetX, targetY, spec, intensity) {
+            ctx.save();
+            const angle = Math.atan2(targetY - (ly + 18), targetX - (lx + 24));
+
+            // Berkas sinar volumetrik jika intensitas > 0
+            if (intensity > 0) {
+                const alpha = 0.06 + (intensity / 100) * 0.26;
+                const beamGrad = ctx.createLinearGradient(lx + 24, ly + 18, targetX, targetY);
+                beamGrad.addColorStop(0, `rgba(${spec.r}, ${spec.g}, ${spec.b}, ${alpha * 1.4})`);
+                beamGrad.addColorStop(1, `rgba(${spec.r}, ${spec.g}, ${spec.b}, ${alpha * 0.35})`);
+
+                ctx.fillStyle = beamGrad;
+                ctx.beginPath();
+                ctx.moveTo(lx + 20, ly + 6);
+                ctx.lineTo(targetX - 4, targetY - 46);
+                ctx.lineTo(targetX - 4, targetY + 46);
+                ctx.lineTo(lx + 20, ly + 30);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // Rumah Lampu Optik
+            ctx.translate(lx + 12, ly + 18);
+            ctx.rotate(angle);
+
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.roundRect(-22, -14, 36, 28, 5);
+            ctx.fill();
+            ctx.stroke();
+
+            // Lensa Optik Depan
+            ctx.fillStyle = intensity > 0 ? spec.css : '#334155';
+            ctx.beginPath();
+            ctx.ellipse(15, 0, 5, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Helper Visual: Paket Gelombang Foton
+        function drawPhotonPacket(ctx, x, y, angle, colorCss, phase) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.strokeStyle = colorCss;
+            ctx.lineWidth = 2;
+            ctx.shadowColor = colorCss;
+            ctx.shadowBlur = 8;
+
+            ctx.beginPath();
+            for (let dx = -12; dx <= 12; dx += 2) {
+                const dy = Math.sin(dx * 0.45 + phase) * 3.5 * Math.cos((dx / 12) * (Math.PI / 2));
+                if (dx === -12) ctx.moveTo(dx, dy);
+                else ctx.lineTo(dx, dy);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Helper Visual: Elektron Partikel Bulat Bersih Tanpa Ekor
+        function drawCleanElectron(ctx, x, y) {
+            ctx.save();
+            // Lingkaran aura medan listrik halus
+            const glow = ctx.createRadialGradient(x, y, 1, x, y, 10);
+            glow.addColorStop(0, 'rgba(56, 189, 248, 0.9)');
+            glow.addColorStop(0.5, 'rgba(14, 165, 233, 0.35)');
+            glow.addColorStop(1, 'rgba(14, 165, 233, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Inti partikel elektron
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Simbol muatan negatif (-)
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x - 2.3, y);
+            ctx.lineTo(x + 2.3, y);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Helper Visual: Catu Daya Variabel DC (Baterai)
+        function drawDCPowerSupply(ctx, cx, cy, voltage) {
+            ctx.save();
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx - 45, cy - 22, 90, 44, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            // Label Tegangan
+            const sign = voltage > 0 ? '+' : '';
+            ctx.fillStyle = voltage < 0 ? '#fb7185' : (voltage > 0 ? '#34d399' : '#94a3b8');
+            ctx.font = 'bold 12px "JetBrains Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${sign}${voltage.toFixed(2)} V`, cx, cy + 4);
+
+            // Indikator kutub kiri (Katoda) & kanan (Anoda)
+            ctx.font = 'bold 10px Inter, sans-serif';
+            ctx.fillStyle = voltage >= 0 ? '#38bdf8' : '#fb7185';
+            ctx.fillText(voltage >= 0 ? '−' : '+', cx - 34, cy - 8);
+            ctx.fillStyle = voltage >= 0 ? '#fb7185' : '#38bdf8';
+            ctx.fillText(voltage >= 0 ? '+' : '−', cx + 34, cy - 8);
+            ctx.restore();
+        }
+
+        // Helper Visual: Amperemeter Digital
+        function drawAmmeterInstrument(ctx, cx, cy, current) {
+            ctx.save();
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = current > 0 ? '#f59e0b' : '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx - 38, cy - 22, 76, 44, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 11px "JetBrains Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${current.toFixed(2)}mA`, cx, cy + 4);
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = '9px Inter, sans-serif';
+            ctx.fillText('AMPEREMETER', cx, cy - 9);
+            ctx.restore();
+        }
+
+        // --- 5. GRAFIK DINAMIS Ek vs FREKUENSI ---
+        function drawGraph() {
+            const w = graphCanvas.clientWidth;
+            const h = graphCanvas.clientHeight;
+            if (w === 0 || h === 0) return;
+
+            graphCtx.clearRect(0, 0, w, h);
+
+            const padL = 46;
+            const padR = 20;
+            const padT = 22;
+            const padB = 36;
+            const plotW = w - padL - padR;
+            const plotH = h - padT - padB;
+
+            const maxFreq = 20; // dalam 10^14 Hz
+            const maxEk = 6.5;  // dalam eV
+
+            const toX = (f) => padL + (f / maxFreq) * plotW;
+            const toY = (ek) => (padT + plotH) - (ek / maxEk) * plotH;
+
+            // Grid bantu
+            graphCtx.strokeStyle = 'rgba(51, 65, 85, 0.35)';
+            graphCtx.lineWidth = 1;
+            for (let f = 0; f <= maxFreq; f += 4) {
+                const gx = toX(f);
+                graphCtx.beginPath();
+                graphCtx.moveTo(gx, padT);
+                graphCtx.lineTo(gx, padT + plotH);
+                graphCtx.stroke();
+
+                graphCtx.fillStyle = '#64748b';
+                graphCtx.font = '10px "JetBrains Mono", monospace';
+                graphCtx.textAlign = 'center';
+                graphCtx.fillText(f, gx, padT + plotH + 14);
+            }
+
+            for (let ek = 0; ek <= 6; ek += 1) {
+                const gy = toY(ek);
+                graphCtx.beginPath();
+                graphCtx.moveTo(padL, gy);
+                graphCtx.lineTo(padL + plotW, gy);
+                graphCtx.stroke();
+
+                graphCtx.fillStyle = '#64748b';
+                graphCtx.font = '10px "JetBrains Mono", monospace';
+                graphCtx.textAlign = 'right';
+                graphCtx.fillText(ek, padL - 7, gy + 3);
+            }
+
+            // Sumbu X dan Y
+            graphCtx.strokeStyle = '#94a3b8';
+            graphCtx.lineWidth = 1.5;
+            graphCtx.beginPath();
+            graphCtx.moveTo(padL, padT);
+            graphCtx.lineTo(padL, padT + plotH);
+            graphCtx.lineTo(padL + plotW, padT + plotH);
+            graphCtx.stroke();
+
+            // Label Sumbu
+            graphCtx.fillStyle = '#cbd5e1';
+            graphCtx.font = 'bold 10px Inter, sans-serif';
+            graphCtx.textAlign = 'center';
+            graphCtx.fillText('Frekuensi f (× 10¹⁴ Hz)', padL + plotW / 2, h - 6);
+
+            graphCtx.save();
+            graphCtx.translate(13, padT + plotH / 2);
+            graphCtx.rotate(-Math.PI / 2);
+            graphCtx.fillText('Ek maks (eV)', 0, 0);
+            graphCtx.restore();
+
+            // Garis Karakteristik Logam Terpilih (Ek = h*f - W0)
+            const f0 = simState.thresholdFreq;
+            const fEnd = maxFreq;
+            const ekEnd = (H_EV * fEnd * 1e14) - METALS[simState.metalKey].workFunc;
+
+            if (f0 < maxFreq) {
+                graphCtx.save();
+                graphCtx.strokeStyle = '#38bdf8';
+                graphCtx.lineWidth = 2.5;
+                graphCtx.beginPath();
+                graphCtx.moveTo(toX(f0), toY(0));
+                graphCtx.lineTo(toX(fEnd), toY(ekEnd));
+                graphCtx.stroke();
+
+                // Titik Frekuensi Ambang (f0)
+                graphCtx.fillStyle = '#f59e0b';
+                graphCtx.beginPath();
+                graphCtx.arc(toX(f0), toY(0), 4.5, 0, Math.PI * 2);
+                graphCtx.fill();
+                graphCtx.restore();
+            }
+
+            // Titik Keadaan Eksperimen Saat Ini
+            const curF = Math.min(simState.frequency, maxFreq);
+            const curEk = Math.min(simState.ekMax, maxEk);
+            const px = toX(curF);
+            const py = toY(curEk);
+
+            graphCtx.save();
+            graphCtx.setLineDash([4, 4]);
+            graphCtx.strokeStyle = 'rgba(52, 211, 153, 0.5)';
+            graphCtx.beginPath();
+            graphCtx.moveTo(px, padT + plotH);
+            graphCtx.lineTo(px, py);
+            graphCtx.lineTo(padL, py);
+            graphCtx.stroke();
+            graphCtx.restore();
+
+            graphCtx.fillStyle = simState.ekMax > 0 ? '#10b981' : '#f43f5e';
+            graphCtx.beginPath();
+            graphCtx.arc(px, py, 5.5, 0, Math.PI * 2);
+            graphCtx.fill();
+            graphCtx.strokeStyle = '#ffffff';
+            graphCtx.lineWidth = 1.5;
+            graphCtx.stroke();
+        }
+
+        // --- 6. BANK SOAL EVALUASI (PG, BENAR/SALAH, MCMA) ---
+        const QUIZ_DATA = [
+            {
+                id: 1,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Dalam suatu percobaan efek fotolistrik menggunakan katoda Kalium (fungsi kerja \\(W_0 = 2,30\\text{ eV}\\)), digunakan cahaya monokromatik dengan energi foton \\(3,10\\text{ eV}\\) dan intensitas tertentu. Apabila sumber cahaya diganti dengan cahaya lain yang memiliki frekuensi sama tetapi intensitasnya diperbesar menjadi dua kali semula, besaran fisis yang akan mengalami perubahan adalah ....',
+                options: [
+                    'Energi kinetik maksimum fotoelektron menjadi dua kali semula',
+                    'Potensial henti yang diperlukan untuk menahan elektron menjadi dua kali semula',
+                    'Kuat arus fotoelektron jenuh menjadi dua kali semula',
+                    'Fungsi kerja logam Kalium berkurang menjadi setengahnya',
+                    'Frekuensi ambang logam Kalium meningkat dua kali lipat'
+                ],
+                correct: 2,
+                explanation: 'Menaikkan intensitas cahaya pada frekuensi tetap berarti memperbanyak jumlah foton yang menumbuk permukaan katoda per detik, tanpa mengubah energi tiap foton. Akibatnya, jumlah fotoelektron yang lepas per detik meningkat dua kali lipat sehingga <strong>kuat arus fotoelektron jenuh menjadi dua kali semula</strong>, sedangkan \\(E_{k,\\text{maks}}\\) dan \\(V_0\\) tetap.'
+            },
+            {
+                id: 2,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Permukaan logam Natrium yang memiliki fungsi kerja \\(2,75\\text{ eV}\\) disinari oleh radiasi ultraviolet dengan panjang gelombang \\(310\\text{ nm}\\) (gunakan \\(h \\cdot c \\approx 1240\\text{ eV}\\cdot\\text{nm}\\)). Besar tegangan balik minimum (potensial henti) yang harus diberikan antara anoda dan katoda agar tidak ada satu pun elektron yang mencapai anoda adalah ....',
+                options: [
+                    '0,75 V',
+                    '1,25 V',
+                    '2,00 V',
+                    '2,75 V',
+                    '4,00 V'
+                ],
+                correct: 1,
+                explanation: 'Energi foton datang: \\(E = \\frac{hc}{\\lambda} = \\frac{1240\\text{ eV}\\cdot\\text{nm}}{310\\text{ nm}} = 4,00\\text{ eV}\\).<br>Energi kinetik maksimum elektron: \\(E_{k,\\text{maks}} = E - W_0 = 4,00 - 2,75 = 1,25\\text{ eV}\\).<br>Karena \\(E_{k,\\text{maks}} = e \\cdot V_0\\), maka potensial henti \\(V_0 = \\mathbf{1,25\\text{ V}}\\).'
+            },
+            {
+                id: 3,
+                type: 'tf',
+                typeLabel: 'Benar / Salah (Pernyataan Majemuk)',
+                question: 'Perhatikan data fungsi kerja tiga jenis logam berikut: <strong>Sesium (2,10 eV)</strong>, <strong>Seng (4,30 eV)</strong>, dan <strong>Platina (5,65 eV)</strong>. Ketiga logam tersebut disinari secara bergantian menggunakan cahaya dengan panjang gelombang \\(400\\text{ nm}\\) (\\(hc = 1240\\text{ eV}\\cdot\\text{nm}\\)). Tentukan status <strong>Benar</strong> atau <strong>Salah</strong> untuk setiap pernyataan berikut!',
+                statements: [
+                    { text: 'Energi setiap foton yang menyinari ketiga logam adalah 3,10 eV.', answer: true },
+                    { text: 'Hanya logam Sesium yang mengalami emisi fotoelektron pada penyinaran tersebut.', answer: true },
+                    { text: 'Jika intensitas cahaya diperbesar hingga 100%, logam Seng akan mulai memancarkan elektron.', answer: false }
+                ],
+                explanation: '• <strong>Pernyataan 1 (Benar):</strong> \\(E = 1240 / 400 = 3,10\\text{ eV}\\).<br>• <strong>Pernyataan 2 (Benar):</strong> Syarat emisi adalah \\(E \\ge W_0\\). Hanya Sesium (\\(2,10\\text{ eV} < 3,10\\text{ eV}\\)) yang memenuhi syarat.<br>• <strong>Pernyataan 3 (Salah):</strong> Intensitas tidak menambah energi tiap foton, sehingga logam Seng (\\(4,30\\text{ eV}\\)) tetap tidak akan melepaskan elektron.'
+            },
+            {
+                id: 4,
+                type: 'mcma',
+                typeLabel: 'Pilihan Ganda Kompleks (Pilih lebih dari satu jawaban benar)',
+                question: 'Dalam eksperimen efek fotolistrik, grafik hubungan antara energi kinetik maksimum fotoelektron (\\(E_{k,\\text{maks}}\\)) terhadap frekuensi cahaya datang (\\(f\\)) membentuk garis lurus miring. Manakah pernyataan-pernyataan berikut yang <strong>BENAR</strong> terkait grafik tersebut? <em>(Pilih semua jawaban yang benar)</em>',
+                options: [
+                    'Gradien (kemiringan) garis grafik bernilai sama untuk semua jenis logam katoda',
+                    'Titik potong garis grafik pada sumbu mendatar (frekuensi) menunjukkan nilai frekuensi ambang logam',
+                    'Jika logam diganti dengan logam yang fungsi kerjanya lebih besar, grafik bergeser sejajar ke kanan',
+                    'Memperbesar intensitas cahaya akan menggeser garis grafik sejajar ke arah atas'
+                ],
+                correct: [0, 1, 2],
+                explanation: 'Dari persamaan \\(E_{k,\\text{maks}} = h f - W_0\\) (analog dengan \\(y = mx - c\\)):<br>• Kemiringan garis \\(m = h\\) (konstanta Planck) sehingga selalu sama untuk semua logam <strong>(Benar)</strong>.<br>• Saat \\(E_{k,\\text{maks}} = 0\\), diperoleh \\(f = f_0\\) pada sumbu datar <strong>(Benar)</strong>.<br>• Logam dengan \\(W_0\\) lebih besar memiliki \\(f_0\\) lebih besar, sehingga garis bergeser sejajar ke kanan <strong>(Benar)</strong>.<br>• Intensitas tidak memengaruhi \\(E_{k,\\text{maks}}\\) maupun \\(f_0\\), sehingga grafik tidak bergeser.'
+            },
+            {
+                id: 5,
+                type: 'mcma',
+                typeLabel: 'Pilihan Ganda Kompleks (Pilih lebih dari satu jawaban benar)',
+                question: 'Sebuah tabung fotolistrik menghasilkan arus listrik sebesar \\(0,40\\text{ mA}\\) saat tegangan baterai diatur pada \\(0,00\\text{ V}\\). Kemudian tegangan baterai diubah secara perlahan menjadi negatif hingga mencapai \\(-1,80\\text{ V}\\), saat mana amperemeter tepat menunjukkan angka \\(0,00\\text{ mA}\\). Berdasarkan peristiwa ini, simpulan yang tepat adalah .... <em>(Pilih semua jawaban yang benar)</em>',
+                options: [
+                    'Energi kinetik maksimum fotoelektron saat lepas dari katoda adalah 1,80 eV',
+                    'Pada tegangan -1,80 V, tidak ada lagi elektron yang terlepas dari permukaan katoda',
+                    'Jika tegangan diatur pada -0,90 V, masih terdapat arus listrik yang terbaca pada amperemeter',
+                    'Energi foton yang menyinari katoda pasti lebih besar dari 1,80 eV'
+                ],
+                correct: [0, 2, 3],
+                explanation: '• Potensial henti \\(V_0 = 1,80\\text{ V}\\) berarti \\(E_{k,\\text{maks}} = 1,80\\text{ eV}\\) <strong>(Benar)</strong>.<br>• Pada tegangan \\(-V_0\\), elektron tetap terlepas dari katoda namun berbalik arah sebelum menyentuh anoda (pernyataan kedua salah).<br>• Pada \\(-0,90\\text{ V}\\), elektron berenergi kinetik di atas \\(0,90\\text{ eV}\\) masih sanggup mencapai anoda sehingga arus tetap mengalir <strong>(Benar)</strong>.<br>• Karena \\(E = W_0 + E_{k,\\text{maks}}\\) dan \\(W_0 > 0\\), maka energi foton \\(E\\) pasti lebih besar dari \\(1,80\\text{ eV}\\) <strong>(Benar)</strong>.'
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            QUIZ_DATA.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950 rounded-2xl border border-slate-800 p-5 sm:p-6 space-y-4';
+                card.id = `q-card-${item.id}`;
+
+                let badgeColor = 'bg-sky-500/20 text-sky-300 border-sky-500/30';
+                if (item.type === 'tf') badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+                if (item.type === 'mcma') badgeColor = 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+
+                let bodyHtml = `
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Soal #${index + 1}</span>
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full border ${badgeColor}">${item.typeLabel}</span>
+                    </div>
+                    <p class="text-sm sm:text-base text-slate-200 leading-relaxed">${item.question}</p>
+                `;
+
+                if (item.type === 'pg') {
+                    const letters = ['A', 'B', 'C', 'D', 'E'];
+                    bodyHtml += `<div class="space-y-2.5 pt-1">`;
+                    item.options.forEach((opt, optIdx) => {
+                        bodyHtml += `
+                            <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-sky-500/50 cursor-pointer transition" id="q-${item.id}-opt-${optIdx}">
+                                <input type="radio" name="q-${item.id}" value="${optIdx}" class="mt-1 accent-sky-500 w-4 h-4 shrink-0">
+                                <span class="text-sm text-slate-300"><strong class="text-slate-100 mr-1.5">${letters[optIdx]}.</strong> ${opt}</span>
+                            </label>
+                        `;
+                    });
+                    bodyHtml += `</div>`;
+                } else if (item.type === 'tf') {
+                    bodyHtml += `
+                        <div class="overflow-x-auto rounded-xl border border-slate-800">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-900 text-xs uppercase text-slate-400 border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-3">Pernyataan Analisis</th>
+                                        <th class="p-3 text-center w-24">Benar</th>
+                                        <th class="p-3 text-center w-24">Salah</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800 bg-slate-900/40">
+                    `;
+                    item.statements.forEach((st, stIdx) => {
+                        bodyHtml += `
+                            <tr id="q-${item.id}-row-${stIdx}">
+                                <td class="p-3 text-slate-300">${st.text}</td>
+                                <td class="p-3 text-center">
+                                    <input type="radio" name="q-${item.id}-st-${stIdx}" value="true" class="accent-emerald-500 w-4 h-4 cursor-pointer">
+                                </td>
+                                <td class="p-3 text-center">
+                                    <input type="radio" name="q-${item.id}-st-${stIdx}" value="false" class="accent-rose-500 w-4 h-4 cursor-pointer">
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    bodyHtml += `</tbody></table></div>`;
+                } else if (item.type === 'mcma') {
+                    bodyHtml += `<div class="space-y-2.5 pt-1">`;
+                    item.options.forEach((opt, optIdx) => {
+                        bodyHtml += `
+                            <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-purple-500/50 cursor-pointer transition" id="q-${item.id}-opt-${optIdx}">
+                                <input type="checkbox" name="q-${item.id}" value="${optIdx}" class="mt-1 accent-purple-500 w-4 h-4 rounded shrink-0">
+                                <span class="text-sm text-slate-300">${opt}</span>
+                            </label>
+                        `;
+                    });
+                    bodyHtml += `</div>`;
+                }
+
+                // Kotak Pembahasan (tersembunyi sebelum disubmit)
+                bodyHtml += `
+                    <div id="q-exp-${item.id}" class="hidden p-4 rounded-xl bg-slate-900 border border-slate-700/80 text-sm text-slate-300 space-y-1.5">
+                        <div class="flex items-center gap-2 font-bold" id="q-status-${item.id}"></div>
+                        <p class="text-xs sm:text-sm leading-relaxed text-slate-300">${item.explanation}</p>
+                    </div>
+                `;
+
+                card.innerHTML = bodyHtml;
+                container.appendChild(card);
+            });
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function submitQuiz() {
+            let totalScore = 0;
+            const pointsPerQuestion = 100 / QUIZ_DATA.length;
+
+            QUIZ_DATA.forEach(item => {
+                const expBox = document.getElementById(`q-exp-${item.id}`);
+                const statusEl = document.getElementById(`q-status-${item.id}`);
+                expBox.classList.remove('hidden');
+
+                let earned = 0;
+
+                if (item.type === 'pg') {
+                    const selected = document.querySelector(`input[name="q-${item.id}"]:checked`);
+                    const userAns = selected ? parseInt(selected.value) : -1;
+
+                    item.options.forEach((_, idx) => {
+                        const lbl = document.getElementById(`q-${item.id}-opt-${idx}`);
+                        lbl.classList.remove('border-emerald-500', 'bg-emerald-950/30', 'border-rose-500', 'bg-rose-950/30');
+                        if (idx === item.correct) {
+                            lbl.classList.add('border-emerald-500', 'bg-emerald-950/30');
+                        } else if (idx === userAns && userAns !== item.correct) {
+                            lbl.classList.add('border-rose-500', 'bg-rose-950/30');
+                        }
+                    });
+
+                    if (userAns === item.correct) {
+                        earned = pointsPerQuestion;
+                        statusEl.innerHTML = '<span class="text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i> Jawaban Benar! (+20 poin)</span>';
+                    } else {
+                        statusEl.innerHTML = '<span class="text-rose-400"><i class="fa-solid fa-circle-xmark mr-1"></i> Jawaban Kurang Tepat</span>';
+                    }
+                } else if (item.type === 'tf') {
+                    let correctCount = 0;
+                    item.statements.forEach((st, stIdx) => {
+                        const row = document.getElementById(`q-${item.id}-row-${stIdx}`);
+                        const sel = document.querySelector(`input[name="q-${item.id}-st-${stIdx}"]:checked`);
+                        const userVal = sel ? (sel.value === 'true') : null;
+
+                        row.classList.remove('bg-emerald-950/30', 'bg-rose-950/30');
+                        if (userVal === st.answer) {
+                            correctCount++;
+                            row.classList.add('bg-emerald-950/30');
+                        } else {
+                            row.classList.add('bg-rose-950/30');
+                        }
+                    });
+
+                    earned = (correctCount / item.statements.length) * pointsPerQuestion;
+                    if (correctCount === item.statements.length) {
+                        statusEl.innerHTML = `<span class="text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i> Semua Pernyataan Tepat! (+${earned.toFixed(0)} poin)</span>`;
+                    } else {
+                        statusEl.innerHTML = `<span class="text-amber-400"><i class="fa-solid fa-circle-info mr-1"></i> Tepat ${correctCount} dari ${item.statements.length} pernyataan (+${earned.toFixed(1)} poin)</span>`;
+                    }
+                } else if (item.type === 'mcma') {
+                    const checked = Array.from(document.querySelectorAll(`input[name="q-${item.id}"]:checked`)).map(el => parseInt(el.value));
+                    
+                    item.options.forEach((_, idx) => {
+                        const lbl = document.getElementById(`q-${item.id}-opt-${idx}`);
+                        lbl.classList.remove('border-emerald-500', 'bg-emerald-950/30', 'border-rose-500', 'bg-rose-950/30');
+                        const isCorrectOpt = item.correct.includes(idx);
+                        const isChecked = checked.includes(idx);
+
+                        if (isCorrectOpt) {
+                            lbl.classList.add('border-emerald-500', 'bg-emerald-950/30');
+                        } else if (isChecked && !isCorrectOpt) {
+                            lbl.classList.add('border-rose-500', 'bg-rose-950/30');
+                        }
+                    });
+
+                    const isExactMatch = checked.length === item.correct.length && item.correct.every(v => checked.includes(v));
+                    if (isExactMatch) {
+                        earned = pointsPerQuestion;
+                        statusEl.innerHTML = '<span class="text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i> Pilihan Kompleks Tepat! (+20 poin)</span>';
+                    } else {
+                        statusEl.innerHTML = '<span class="text-rose-400"><i class="fa-solid fa-circle-xmark mr-1"></i> Pilihan Kompleks Belum Tepat (Perhatikan kotak hijau)</span>';
+                    }
+                }
+
+                totalScore += earned;
+            });
+
+            const scoreBox = document.getElementById('quiz-score-box');
+            const scoreVal = document.getElementById('quiz-score-val');
+            scoreBox.classList.remove('hidden');
+            scoreVal.textContent = `${Math.round(totalScore)} / 100`;
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+            scoreBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-score-box').classList.add('hidden');
+            renderQuiz();
+        }
+
+        // --- 7. INISIALISASI SAAT HALAMAN DIMUAT ---
+        window.onload = function() {
+            resizeCanvases();
+            updateSimulationParams();
+            renderQuiz();
+            requestAnimationFrame(animateLab);
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        };
+    </script>
+</body>
+</html>
